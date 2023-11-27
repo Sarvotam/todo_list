@@ -4,8 +4,19 @@ from django.views.generic.detail import DetailView
 #To create view we need to import
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+
+#https://ccbv.co.uk/projects/Django/4.2/django.contrib.auth.views/LoginView/
+from django.contrib.auth.views import LoginView
+
 from .models import Task
-# Create your views here.
+
+class CustomLoginView(LoginView):
+    template_name = 'base/login.html'
+    fileds = '__all__'
+    redirect_authenticated_user = True
+
+    def get_success_url(self):
+        return reverse_lazy('tasks')
 
 # from django.http import HttpResponse
 
@@ -39,3 +50,5 @@ class DeleteView(DeleteView):
     model = Task
     context_object_name = 'task'
     success_url = reverse_lazy('tasks')
+
+

@@ -8,6 +8,8 @@ from django.urls import reverse_lazy
 #https://ccbv.co.uk/projects/Django/4.2/django.contrib.auth.views/LoginView/
 from django.contrib.auth.views import LoginView
 
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 from .models import Task
 
 class CustomLoginView(LoginView):
@@ -25,28 +27,28 @@ class CustomLoginView(LoginView):
 #     return HttpResponse('To Do List')
 
 #Class base views
-class TaskList(ListView):
+class TaskList(LoginRequiredMixin, ListView):
     model = Task
     context_object_name = 'tasks' #More readabale and better than just Object list [<!-- {% for task in object_list %} --> ]
 
-class TaskDetail(DetailView):
+class TaskDetail(LoginRequiredMixin, DetailView):
     model = Task
     context_object_name = 'task'
     template_name = 'base/task.html'
     
 #By default this view looks for a template the model name and then the prefix(task) of underscore _form
-class TaskCreate(CreateView):
+class TaskCreate(LoginRequiredMixin, CreateView):
     model = Task
     fields = '__all__'
     success_url = reverse_lazy('tasks')
 
 #By default this view also looks for a template the model name and then the prefix(task) of underscore _form
-class TaskUpdate(UpdateView):
+class TaskUpdate(LoginRequiredMixin, UpdateView):
     model = Task
     fields = '__all__'
     success_url = reverse_lazy('tasks')
 
-class DeleteView(DeleteView):
+class DeleteView(LoginRequiredMixin, DeleteView):
     model = Task
     context_object_name = 'task'
     success_url = reverse_lazy('tasks')

@@ -31,6 +31,13 @@ class TaskList(LoginRequiredMixin, ListView):
     model = Task
     context_object_name = 'tasks' #More readabale and better than just Object list [<!-- {% for task in object_list %} --> ]
 
+    # Function for a user to ensure user get their own data only
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs) # super() = set to original value
+        context['tasks'] = context['tasks'].filter(user=self.request.user)
+        context['count'] = context['tasks'].filter(complete=False).count()
+        return context
+
 class TaskDetail(LoginRequiredMixin, DetailView):
     model = Task
     context_object_name = 'task'
@@ -39,13 +46,17 @@ class TaskDetail(LoginRequiredMixin, DetailView):
 #By default this view looks for a template the model name and then the prefix(task) of underscore _form
 class TaskCreate(LoginRequiredMixin, CreateView):
     model = Task
-    fields = '__all__'
+    fields = ['title', 'description', 'complete']
     success_url = reverse_lazy('tasks')
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super(TaskCreate, self).form_valid(form)
 
 #By default this view also looks for a template the model name and then the prefix(task) of underscore _form
 class TaskUpdate(LoginRequiredMixin, UpdateView):
     model = Task
-    fields = '__all__'
+    fields = ['title', 'description', 'complete']
     success_url = reverse_lazy('tasks')
 
 class DeleteView(LoginRequiredMixin, DeleteView):
